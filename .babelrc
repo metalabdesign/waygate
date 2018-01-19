@@ -1,0 +1,24 @@
+{
+  "env": {
+    "test": {
+      "plugins": [
+        ["babel-plugin-transform-adana", {
+          "only": "src/**/*.js"
+        }]
+      ]
+    }
+  },
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": {
+        "node": 4
+      },
+      "shippedProposals": true
+    }],
+    "@babel/preset-react",
+    "@babel/preset-flow"
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties"
+  ]
+}

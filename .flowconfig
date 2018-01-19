@@ -1,0 +1,11 @@
+[ignore]
+.*\.flow
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+emoji=true
+suppress_comment=\\(.\\|\n\\)*\\$FlowIgnore
