@@ -11,7 +11,7 @@
     "copy": "./node_modules/.bin/ncp src lib && ./node_modules/.bin/renamer --regex --find '$' --replace '.flow' 'lib/**/*.js'",
     "import": "./node_modules/.bin/ncp lib .",
     "test": "npm run lint && npm run flow",
-    "spec": "NODE_ENV=test ./node_modules/.bin/_mocha -r adana-dump -r @babel/register -r test/helpers/chai.js -R spec --recursive test/spec",
+    "spec": "NODE_ENV=test ./node_modules/.bin/_mocha -r adana-dump -r @babel/register -r test/helper/unexpected.js -R spec --recursive test/spec",
     "lint": "./node_modules/.bin/eslint .",
     "flow": "./node_modules/.bin/flow check"
   },
@@ -24,6 +24,7 @@
     "@babel/preset-react": "^7.0.0-beta.38",
     "@babel/register": "^7.0.0-beta.38",
     "adana-cli": "^0.1.2",
+    "adana-dump": "^0.1.0",
     "adana-format-istanbul": "^0.1.2",
     "babel-plugin-transform-adana": "^1.0.2",
     "chai": "^4.1.2",
@@ -34,9 +35,12 @@
     "ncp": "^2.0.0",
     "react": "^16.2.0",
     "react-redux": "^5.0.6",
+    "react-test-renderer": "^16.2.0",
     "redux": "^3.7.2",
     "renamer": "^0.6.1",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "unexpected": "^10.36.3",
+    "unexpected-react": "^5.0.1"
   },
   "dependencies": {
     "path-to-regexp": "^2.1.0",

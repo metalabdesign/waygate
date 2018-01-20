@@ -2,23 +2,40 @@
 
 You probably want [react-router] instead.
 
-Leveraging `redux` to power your react routing needs. The API very closely resembles [react-router] because familiarity is good.
+Leveraging `redux` to power your react routing needs. The API very closely resembles [react-router] because familiarity is good and I personally like the declarative syntax. This exists mostly as an experiment to have _all_ the routing state controlled by `redux`. For people who lean more towards the purist side of functional programming this may be appealing. Works with [react-hot-loader] too.
 
 ## Usage
 
 ```js
 import React from 'react';
 import {Provider} from 'react-redux';
-import {Match, Switch} from 'waygate';
+import {Match, Switch, navigate} from 'waygate';
 
+// Create a `Link` component for your app.
+const Link = connect(null, {navigate})(({navigate, to, ...rest}) => (
+  <a
+    onClick={(ev) => {
+      ev.preventDefault();
+      navigate(to);
+    }}
+    {...rest}
+  />
+));
+
+// Create a navigation tree.
 const App = ({store}) => (
   <Provider store={store}>
     <Switch>
       <Match path='/' exact>
-        <div>Something</div>
+        <div>
+          Foo
+          <Link to='/bar'>
+            Go to /bar
+          </Link>
+        </div>
       </Match>
-      <Match path='/' key='notFound'>
-        <div>Not found</div>
+      <Match path='/bar'>
+        <div>Bar</div>
       </Match>
     </Switch>
   </Provider>
@@ -74,15 +91,35 @@ export default render;
 Render the first match-compatible component in a list of children. Switch does not render child `Match` nodes in the react tree – only their children. This allows you to perform animations and transitions with tools like `react-motion`.
 
 ```js
-const Transition = (children) => (
-  <MotionTransition>
-    {children}
-  </MotionTransition>
+const willLeave = () => ({opacity: 0});
+
+const styles = (children) => React.Children.map(children, (child) => {
+  return {
+    key: child.key,
+    style: {opacity: 1},
+    data: child,
+  }
+});
+
+const Transition = ({children}) => (
+  <TransitionMotion
+    willLeave={willLeave}
+    styles={styles(children)}
+    children={(styles) => {
+      <div>
+        {styles.map(({style: {opacity}, data: child, key}) => (
+          <div style={{opacity}} key={key}>
+            {child}
+          </div>
+        ))}
+      </div>
+    }}
+  />
 );
 
 <Switch component={Transition}>
-  <Match/>
-  <Match/>
+  <Match path='/foo' key='a' children='foo'/>
+  <Match path='/bar' key='b' children='bar'/>
 </Switch>
 ```
 
@@ -96,12 +133,16 @@ Simple match component that allows path and selector based matching.
 </Match>
 ```
 
-```js
-const isAuthenticated = (state) => state.isAuthenticated;
+You can also pull out params from the path:
 
-<Match selector={isAuthenticated}>
-  I will render when the user is authenticated.
+```js
+<Match path='/user/:name'>
+  {({name}) => (
+    <div>Hello {name}</div>
+  )}
 </Match>
 ```
 
 [react-router]: https://github.com/ReactTraining/react-router
+[react-motion]: https://github.com/chenglou/react-motion
+[react-hot-loader]: https://github.com/gaearon/react-hot-loader

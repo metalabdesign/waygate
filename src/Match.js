@@ -20,16 +20,23 @@ const createPathMatcher = (path, options = {end: false}) => {
         keys.forEach(({name}, i) => {
           result[name] = params[i + 1];
         });
-        return {params: result, matches: true, path, options};
+        return {params: result, matches: true, path};
       }
-      return {matches: false, path, options};
+      return {matches: false, path};
     }
   );
+};
+
+type MatchesResult = {
+  matches: boolean,
 };
 
 type Props = {
   path: string,
   exact?: boolean,
+  children: React$Node,
+} | {
+  selector: (Object) => MatchesResult,
   children: React$Node,
 };
 
@@ -37,59 +44,26 @@ type Context = {
   routingPrefix: string,
 };
 
-export default class Match extends React.Component<Props> {
-  static contextTypes = {
-    routingPrefix: PropTypes.string,
-  };
-
-  static childContextTypes = {
-    routingPrefix: PropTypes.string,
-  };
-
-  Wrapper: ComponentType<*> = () => (<div/>);
-
-  constructor(props: Props, context: Context) {
-    super(props, context);
-    this.setMatcher(props, context);
-  }
-
-  getChildContext() {
-    const root = this.context.routingPrefix || '';
-    return {routingPrefix: root + this.props.path};
-  }
-
-  componentWillReceiveProps(nextProps: Props, nextContext: Context) {
-    if (
-      nextProps.children !== this.props.children ||
-      nextContext !== this.context
-    ) {
-      this.setMatcher(nextProps, nextContext);
+const Match = connect((_, props) => {
+  return Match.createMatchSelector(props);
+})(({children, matches, params}) => {
+  if (matches) {
+    if (typeof children === 'function') {
+      return children(params);
     }
+    return children;
   }
+  return null;
+});
 
-  static createMatchSelector(props: Props, context: Context) {
-    return createPathMatcher(
-      (context.routingPrefix || '') + props.path,
-      {end: props.exact || false}
-    );
+Match.createMatchSelector = (props) => {
+  if (props.selector) {
+    return props.selector;
   }
-
-  setMatcher(props: Props, context: Context) {
-    const selector = Match.createMatchSelector(props, context);
-    const {children} = props;
-    this.Wrapper = connect(selector)((props) => {
-      if (props.matches) {
-        if (typeof children === 'function') {
-          return children(props);
-        }
-        return children;
-      }
-      return null;
-    });
-  }
-
-  render() {
-    const Wrapper = this.Wrapper;
-    return <Wrapper/>;
-  }
+  return createPathMatcher(
+    props.path,
+    {end: props.exact || false}
+  );
 }
+
+export default Match;
