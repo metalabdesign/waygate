@@ -40,7 +40,6 @@ export const getPathname = createSelector(getPath, (r) => {
   return /^[^?#]+/.exec(r)[0];
 });
 
-
 type Options = {
   exact?: boolean,
 };

@@ -1,14 +1,17 @@
 /* @flow */
 import pathToRegexp from 'path-to-regexp';
-import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
 import {getPathname} from './selector';
 
-import type {ComponentType} from 'react';
+type MatchesResult = {
+  matches: boolean,
+};
 
-const createPathMatcher = (path, options = {end: false}) => {
+const createPathMatcher = (
+  path: string,
+  options = {end: false}
+): MatchesResult => {
   const keys = [];
   const regexp = pathToRegexp(path.replace(/^\/$/, ''), keys, options);
   return createSelector(
@@ -27,24 +30,13 @@ const createPathMatcher = (path, options = {end: false}) => {
   );
 };
 
-type MatchesResult = {
-  matches: boolean,
-};
-
 type Props = {
   path: string,
   exact?: boolean,
   children: React$Node,
-} | {
-  selector: (Object) => MatchesResult,
-  children: React$Node,
 };
 
-type Context = {
-  routingPrefix: string,
-};
-
-const Match = connect((_, props) => {
+const Match = connect((_, props: Props) => {
   return Match.createMatchSelector(props);
 })(({children, matches, params}) => {
   if (matches) {
@@ -56,14 +48,11 @@ const Match = connect((_, props) => {
   return null;
 });
 
-Match.createMatchSelector = (props) => {
-  if (props.selector) {
-    return props.selector;
-  }
+Match.createMatchSelector = (props: Props) => {
   return createPathMatcher(
     props.path,
     {end: props.exact || false}
   );
-}
+};
 
 export default Match;

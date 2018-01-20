@@ -19,10 +19,10 @@ describe('Switch', () => {
       <Provider store={store}>
         <Switch>
           <Match path='/foo'>
-            a
+            <div>a</div>
           </Match>
           <Match path='/bar'>
-            b
+            <div>b</div>
           </Match>
         </Switch>
       </Provider>
@@ -41,10 +41,10 @@ describe('Switch', () => {
       <Provider store={store}>
         <Switch>
           <Match path='/foo'>
-            a
+            <div>a</div>
           </Match>
           <Match path='/foo'>
-            b
+            <div>b</div>
           </Match>
         </Switch>
       </Provider>
@@ -53,7 +53,7 @@ describe('Switch', () => {
     expect(
       renderer,
       'to have rendered',
-      'a'
+      <div>a</div>
     );
   });
   it('should render null if nothing matches', () => {
@@ -63,15 +63,17 @@ describe('Switch', () => {
       <Provider store={store}>
         <Switch>
           <Match path='/foo'>
-            a
+            <div>a</div>
           </Match>
         </Switch>
       </Provider>
     );
     const renderer = TestRenderer.create(element);
+    // FIXME: Kind of a hack cause `unexpected` doesn't work well with render
+    // returning non-elements.
     expect(
-      renderer,
-      'to have rendered',
+      renderer.toJSON(),
+      'to equal',
       null
     );
   });

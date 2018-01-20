@@ -9,11 +9,14 @@ type Props = {
   children: React$Node,
   component: ComponentType<*>,
 }
+type InnerProps = {
+  index: number,
+  children: Array<React$Node>,
+  props: Object,
+};
 
-const Switch = connect((_, props) => {
+const Switch = connect((_, props: Props) => {
   const args = [];
-  const children = React.Children.toArray(props.children);
-  const Component = props.component;
   React.Children.forEach(props.children, (child) => {
     invariant(
       typeof child.type.createMatchSelector === 'function',
@@ -32,8 +35,9 @@ const Switch = connect((_, props) => {
     }
     return {index: -1};
   });
-})(({index, props, children}) => {
-  const child = children[index] ? children[index].props.children : null;
+})(({index, props, children}: InnerProps) => {
+  const indexed = React.Children.toArray(children);
+  const child = indexed[index] ? indexed[index].props.children : null;
   const result = (typeof child === 'function') ? child(props) : child;
   return result;
 });
