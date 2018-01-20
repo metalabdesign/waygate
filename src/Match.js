@@ -6,12 +6,15 @@ import {getPathname} from './selector';
 
 type MatchesResult = {
   matches: boolean,
+  params?: {[string]: string},
 };
 
-const createPathMatcher = (
+type MatchSelector<T> = (state: T) => MatchesResult;
+
+const createPathMatcher = <T>(
   path: string,
   options = {end: false}
-): MatchesResult => {
+): MatchSelector<T> => {
   const keys = [];
   const regexp = pathToRegexp(path.replace(/^\/$/, ''), keys, options);
   return createSelector(
@@ -33,11 +36,18 @@ const createPathMatcher = (
 type Props = {
   path: string,
   exact?: boolean,
-  children: React$Node,
+  children: React$Node | Function,
 };
 
-const Match = connect((_, props: Props) => {
-  return Match.createMatchSelector(props);
+const createMatchSelector = <T>(props: Props): MatchSelector<T> => {
+  return createPathMatcher(
+    props.path,
+    {end: props.exact || false}
+  );
+};
+
+const Match = connect((_, props: Props): MatchSelector<*> => {
+  return createMatchSelector(props);
 })(({children, matches, params}) => {
   if (matches) {
     if (typeof children === 'function') {
@@ -48,11 +58,7 @@ const Match = connect((_, props: Props) => {
   return null;
 });
 
-Match.createMatchSelector = (props: Props) => {
-  return createPathMatcher(
-    props.path,
-    {end: props.exact || false}
-  );
-};
+// FIXME: Flow escape hatch.
+(Match: any).createMatchSelector = createMatchSelector;
 
 export default Match;
