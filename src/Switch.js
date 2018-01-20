@@ -4,18 +4,17 @@ import {connect} from 'react-redux';
 import invariant from 'invariant';
 import {createSelector} from 'reselect';
 
-import type {ComponentType} from 'react';
 type Props = {
   children: React$Node,
-  component: ComponentType<*>,
 }
 type InnerProps = {
   index: number,
-  children: Array<React$Node>,
+  children: React$Node,
   props: Object,
 };
+type ChildSelector = (state: any) => ({index: number, props: Object});
 
-const Switch = connect((_, props: Props) => {
+const Switch = connect((_, props: Props): ChildSelector => {
   const args = [];
   React.Children.forEach(props.children, (child) => {
     invariant(
@@ -25,7 +24,7 @@ const Switch = connect((_, props: Props) => {
     args.push(child.type.createMatchSelector(child.props));
   });
   if (args.length === 0) {
-    return {index: -1};
+    return () => ({index: -1, props: {}});
   }
   return createSelector(...args, (...children) => {
     for (let i = 0; i < children.length; ++i) {
