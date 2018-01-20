@@ -2,6 +2,12 @@
 
 You probably want [react-router] instead.
 
+![build status](http://img.shields.io/travis/metalabdesign/waygate/master.svg?style=flat)
+![coverage](https://img.shields.io/codecov/c/github/metalabdesign/waygate/master.svg?style=flat)
+![license](http://img.shields.io/npm/l/waygate.svg?style=flat)
+![version](http://img.shields.io/npm/v/waygate.svg?style=flat)
+![downloads](http://img.shields.io/npm/dm/waygate.svg?style=flat)
+
 Leveraging `redux` to power your react routing needs. The API very closely resembles [react-router] because familiarity is good and I personally like the declarative syntax. This exists mostly as an experiment to have _all_ the routing state controlled by `redux`. For people who lean more towards the purist side of functional programming this may be appealing. Works with [react-hot-loader] too.
 
 ## Usage
